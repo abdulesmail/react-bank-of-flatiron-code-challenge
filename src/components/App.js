@@ -8,7 +8,7 @@ function App() {
   const [items, setItems] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:3000/transactions")
+    fetch("https://my-json-server.typicode.com/abdulesmail/react-bank-of-flatiron-code-challenge/transactions")
       .then(res => res.json())
       .then(data => setItems(data));
   }, []);
