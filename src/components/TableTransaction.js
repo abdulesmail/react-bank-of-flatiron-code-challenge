@@ -5,7 +5,7 @@ function TableTransaction({transactions, handleDelete}) {
   
 
  async function deleteTransaction(id) {
-   await fetch(`http://localhost:3000/transactions/${id}`, {
+   await fetch(`https://my-json-server.typicode.com/abdulesmail/react-bank-of-flatiron-code-challenge/transactions/${id}`, {
     method : "DELETE",
   });
   handleDelete(id)
