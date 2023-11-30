@@ -1,60 +1,62 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
-import SearchBar from './SearchBar';
-import FormTransaction from './FormTransaction';
-import TableTransaction from './TableTransaction';
+import TransactionList from './ListOfTransactions';
+import TransactionForm from './FormTransaction';
 
+// Main functional component for the application
 function App() {
-  const [items, setItems] = useState([]);
+  // State for managing transaction data
+  const [dataEntries, setDataEntries] = useState([]);
+  // State for managing search input
+  const [searchQuery, setSearchQuery] = useState('');
+  // State for managing filtered transaction data
+  const [filteredDataEntries, setFilteredDataEntries] = useState([]);
 
+  // Effect to fetch transaction data from the server 
   useEffect(() => {
-    fetch("https://my-json-server.typicode.com/abdulesmail/react-bank-of-flatiron-code-challenge/transactions")
-      .then(res => res.json())
-      .then(data => setItems(data));
+    fetch('http://localhost:3000/transactions') 
+      .then((response) => response.json())
+      .then((data) => setDataEntries(data))
+      .catch((error) => console.error('Error fetching data:', error));
   }, []);
+  
+  // Effect that adds search whenever searchQuery or dataEntries change
+  useEffect(() => {
+    // Function that filters transaction data based on the search 
+    function applySearch() {
+      const filteredData = dataEntries.filter(entry =>
+        entry.description.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setFilteredDataEntries(filteredData);
+    }
+  
+    applySearch();
+  }, [searchQuery, dataEntries]);
 
-  console.log("Items", items);
-
-  function handleDelete(id) {
-    const updatedTransactions = items.filter(item => item.id !== id);
-    setItems(updatedTransactions);
-  }
-
-  function handleSubmit(event) {
-    event.preventDefault();
-
-    // Replace this with the actual logic to get the data for the new transaction
-    const newTransaction = {
-      // Example properties, replace with actual data
-      date: "2023-01-01",
-      description: "New transaction",
-      category: "Income",
-      amount: 100.0,
-    };
-
-    fetch("http://localhost:3000/transactions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(newTransaction),
-    })
-      .then(res => res.json())
-      .then(data => {
-        // Handle the response or update the state if needed
-        // For example, if the API returns the updated list of transactions, you can setItems(data)
-      })
-      .catch(error => {
-        console.error("Error adding transaction:", error);
-      });
-  }
-
+  // JSX for rendering the App
   return (
-    <div className='App-header'>
-      <h1>Flatiron Bank</h1>
-      <SearchBar />
-      <FormTransaction handleSubmit={handleSubmit} />
-      <TableTransaction transactions={items} handleDelete={handleDelete} />
+    <div className="App">
+      <div>
+        <h1>Transactions</h1>
+        <div>
+          {/* Input for search */}
+          <input
+            placeholder="Enter search here"
+            value={searchQuery}
+            style={{ border: "solid", borderRadius:"50px", height: "30px" }}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+      </div>
+
+      {/* Rendering the transaction list with filtered data */}
+      {filteredDataEntries && <TransactionList transaction={filteredDataEntries} />}
+
+      <div>
+        <h1>Add Transaction</h1>
+        {/* Rendering the transaction form */}
+        <TransactionForm />
+      </div>
     </div>
   );
 }
